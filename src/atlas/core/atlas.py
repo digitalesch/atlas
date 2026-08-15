@@ -1,6 +1,6 @@
+from atlas.compiler.compiler import Compiler
 from atlas.events.event_bus import EventBus
 from atlas.events.listener_registry import ListenerRegistry
-from atlas.compiler.compiler import Compiler
 
 
 class Atlas:

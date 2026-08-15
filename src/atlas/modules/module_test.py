@@ -1,5 +1,5 @@
-from atlas.events.event import EventType, Event
 from atlas.core.wrappers import auto_register, subscribe
+from atlas.events.event import Event, EventType
 
 
 @auto_register

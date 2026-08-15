@@ -1,7 +1,7 @@
-from atlas.events.subscription import Subscription
-from atlas.events.event import EventType
-
 from collections import defaultdict
+
+from atlas.events.event import EventType
+from atlas.events.subscription import Subscription
 
 
 class ListenerRegistry:

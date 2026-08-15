@@ -1,7 +1,7 @@
-import uuid
-from dataclasses import dataclass, field
-from typing import Callable
 import inspect
+import uuid
+from collections.abc import Callable
+from dataclasses import dataclass, field
 
 from atlas.events.event import EventType
 

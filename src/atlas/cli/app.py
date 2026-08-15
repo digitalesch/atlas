@@ -1,8 +1,9 @@
 import typer
 from rich.console import Console
-from atlas.core.constants import APP_NAME, VERSION
-from atlas.core.status import STATUS_STYLE, STATUS_OK
+
 from atlas.core.atlas import Atlas
+from atlas.core.constants import APP_NAME, VERSION
+from atlas.core.status import STATUS_OK, STATUS_STYLE
 
 console = Console()
 

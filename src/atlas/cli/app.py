@@ -1,7 +1,8 @@
 import typer
 from rich.console import Console
-from ..core.constants import APP_NAME, VERSION
-from ..core.status import STATUS_STYLE
+from atlas.core.constants import APP_NAME, VERSION
+from atlas.core.status import STATUS_STYLE, STATUS_OK
+from atlas.core.atlas import Atlas
 
 console = Console()
 
@@ -36,3 +37,9 @@ def version():
     """Show version."""
 
     typer.echo(f"{APP_NAME} {VERSION}")
+
+@app.command()
+def compile():
+    """ Compile and creates the modules. """
+    atlas = Atlas()
+    atlas.compile()

@@ -6,16 +6,14 @@ from atlas.core.atlas import Atlas
 
 console = Console()
 
-app = typer.Typer(
-    help="Atlas Mechanical Compiler"
-)
+app = typer.Typer(help="Atlas Mechanical Compiler")
+
 
 def status(label: str, value: str):
     style = STATUS_STYLE[value]
 
-    console.print(
-        f"{label:.<20} [{style['color']}]{value} {style['icon']}[/{style['color']}]"
-    )
+    console.print(f"{label:.<20} [{style['color']}]{value} {style['icon']}[/{style['color']}]")
+
 
 @app.command()
 def doctor():
@@ -23,8 +21,8 @@ def doctor():
 
     console.print(f"[bold cyan]{APP_NAME}[/bold cyan] Compiler")
     typer.echo("----------------")
-    status("Python ",STATUS_OK)
-    status("Environment ",STATUS_OK)
+    status("Python ", STATUS_OK)
+    status("Environment ", STATUS_OK)
     typer.echo("Plugins ........... 0")
     typer.echo("Exporters ......... 0")
     typer.echo("Machine ........... None")
@@ -38,8 +36,9 @@ def version():
 
     typer.echo(f"{APP_NAME} {VERSION}")
 
+
 @app.command()
 def compile():
-    """ Compile and creates the modules. """
+    """Compile and creates the modules."""
     atlas = Atlas()
     atlas.compile()

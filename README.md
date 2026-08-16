@@ -3,6 +3,32 @@
 A lightweight pub/sub system powering Atlas's compiler pipeline. Modules react to
 events (build stages, logs, errors) without needing direct references to each other.
 
+## Status
+
+Sprint 1: proving a minimal Observer/EventBus architecture. No
+mechanical compilation yet — see the roadmap below.
+
+## Roadmap
+
+- [x] Event/Subscription/EventBus/ListenerRegistry
+- [x] Compiler decoupled from listeners
+- [ ] Mechanical IR
+- [ ] Component/Interface registries
+- [ ] Constraint validation
+- [ ] Exporters (OpenSCAD, STEP, BOM)
+
+## Setup
+
+    uv sync
+
+## Running
+
+    uv run atlas
+
+## Testing
+
+    uv run pytest -v
+
 ## Project layout
 
 ```

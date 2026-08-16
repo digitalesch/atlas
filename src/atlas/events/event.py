@@ -10,6 +10,8 @@ class EventType(Enum):
     LOG = 5
     START_BUILD = 6
     END_BUILD = 7
+    COMPILE_START = 8
+    COMPILE_END = 8
 
 
 @dataclass

@@ -1,14 +1,15 @@
-from atlas.machines.dimensions import Dimensions, Machine
+from dataclasses import dataclass
 
-machine = Machine(
-    workspace=Dimensions(
-        x=400,
-        y=400,
-        z=500,
-    ),
-    frame=Dimensions(
-        x=560,
-        y=560,
-        z=680,
-    ),
-)
+from atlas.machines.components.bed import BuildPlate
+from atlas.machines.components.frame import BoxedTowerFrame
+from atlas.machines.components.motion import CoreXY
+from atlas.machines.components.toolhead import Toolhead
+
+
+@dataclass(frozen=True)
+class Machine:
+    name: str
+    frame: BoxedTowerFrame | None = None
+    motion: CoreXY | None = None
+    bed: BuildPlate | None = None
+    toolhead: Toolhead | None = None

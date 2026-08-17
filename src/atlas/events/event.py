@@ -18,3 +18,4 @@ class EventType(Enum):
 class Event:
     type: EventType
     message: str
+    payload: object | None = None

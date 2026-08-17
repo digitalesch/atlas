@@ -42,4 +42,4 @@ def version():
 def compile():
     """Compile and creates the modules."""
     atlas = Atlas()
-    atlas.compile()
+    atlas.compile("Falcon")

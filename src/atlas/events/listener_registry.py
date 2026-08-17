@@ -19,3 +19,26 @@ class ListenerRegistry:
 
     def get_subscribers(self, event_type: EventType):
         return self.registry[event_type].values()  # O(1) lookup, then iterate only relevant subs
+
+    def debug(self):
+        for event_type, subscriptions in self.registry.items():
+
+            if not subscriptions:
+                continue
+
+            print(f"\n{event_type.name}")
+
+            for subscription in subscriptions.values():
+                callback = subscription.callback
+
+                if hasattr(callback, "__self__"):
+                    # Bound method
+                    owner = callback.__self__.__class__.__name__
+                    name = callback.__name__
+
+                else:
+                    # Regular function
+                    owner = callback.__qualname__.split(".")[0]
+                    name = callback.__name__
+
+                print(f"  -> {owner}.{name} " f"[{subscription.id}]")

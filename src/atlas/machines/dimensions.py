@@ -1,14 +1,8 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Dimensions:
     x: float
     y: float
-    z: float
-
-
-@dataclass
-class Machine:
-    workspace: Dimensions
-    frame: Dimensions
+    z: float = 0.0

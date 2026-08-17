@@ -1,11 +1,52 @@
 from atlas.events.event import Event, EventType
 from atlas.events.event_bus import EventBus
-from atlas.machines.machine import Machine
+from atlas.machines.machine_registry import MachineRegistry
+
 
 class Compiler:
-    def __init__(self, event_bus: EventBus):
-        self.event_bus = event_bus
 
-    def compile(self, machine: Machine):
-        self.event_bus.publish(Event(EventType.COMPILE_START, "Starting build"))
-        # self.event_bus.publish(Event(EventType.END_BUILD, "Ending build"))
+    def __init__(
+        self,
+        event_bus: EventBus,
+        machine_registry: MachineRegistry,
+    ):
+        self.event_bus = event_bus
+        self.machine_registry = machine_registry
+
+    def compile(self, machine_name: str = ""):
+
+        machine = self.machine_registry.get(machine_name)
+
+        if machine:
+
+            self.event_bus.publish(
+                Event(
+                    EventType.COMPILE_START,
+                    f"Starting compilation of {machine.name}",
+                    payload=machine,
+                )
+            )
+
+            self.event_bus.publish(
+                Event(
+                    EventType.START_BUILD,
+                    f"Building {machine.name}",
+                    payload=machine,
+                )
+            )
+
+            self.event_bus.publish(
+                Event(
+                    EventType.END_BUILD,
+                    f"Finished building {machine.name}",
+                    payload=machine,
+                )
+            )
+
+            self.event_bus.publish(
+                Event(
+                    EventType.COMPILE_END,
+                    f"Compilation finished: {machine.name}",
+                    payload=machine,
+                )
+            )

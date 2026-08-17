@@ -3,19 +3,113 @@
 A lightweight pub/sub system powering Atlas's compiler pipeline. Modules react to
 events (build stages, logs, errors) without needing direct references to each other.
 
-## Status
+## Architecture
 
-Sprint 1: proving a minimal Observer/EventBus architecture. No
-mechanical compilation yet — see the roadmap below.
+Atlas is being designed as a framework for defining and compiling
+parametric mechanical machines.
 
-## Roadmap
+The goal is not to implement a single printer. Instead, Atlas provides
+the infrastructure needed to describe different machines, compose
+mechanical modules, validate their relationships, and eventually
+generate machine-specific geometry and manufacturing artifacts.
 
-- [x] Event/Subscription/EventBus/ListenerRegistry
-- [x] Compiler decoupled from listeners
-- [ ] Mechanical IR
-- [ ] Component/Interface registries
-- [ ] Constraint validation
-- [ ] Exporters (OpenSCAD, STEP, BOM)
+The architecture is based around four major concepts:
+
+```text
+Machine Definition
+       |
+       v
+Machine Registry
+       |
+       v
+Compiler
+       |
+       v
+Event Bus
+       |
+       +------------------+
+       |                  |
+       v                  v
+   Modules            Validators
+       |                  |
+       +--------+---------+
+                |
+                v
+             Events
+```
+
+# Atlas Roadmap
+
+## Sprint 1 — Compiler Core
+
+### Goal
+
+Build the minimum software architecture required for Atlas to behave
+as a modular compiler rather than a collection of machine-specific
+scripts.
+
+### Status
+
+**In progress**
+
+---
+
+### 1. CLI Foundation
+
+Status: **DONE**
+
+- [x] Typer application
+- [x] `doctor` command
+- [x] `version` command
+- [x] formatted status output
+- [x] project constants
+- [x] initial package structure
+
+---
+
+### 2. Event System
+
+Status: **DONE**
+
+- [x] Base `Event`
+- [x] `EventType`
+- [x] event publishing
+- [x] EventBus
+- [x] ListenerRegistry
+- [x] Subscription model
+- [x] subscription IDs
+- [x] subscribe
+- [x] unsubscribe foundation
+- [x] multiple subscribers per event
+- [x] module callbacks
+- [x] event payload support
+
+---
+
+### 3. Declarative Module Registration
+
+Status: **DONE**
+
+- [x] `@subscribe`
+- [x] `@auto_register`
+- [x] automatic subscription discovery
+- [x] module self-registration
+- [x] bound method callbacks
+- [x] module-to-module event communication
+
+Example:
+
+```python
+@auto_register
+class ModuleA:
+
+    @subscribe(
+        EventType.START_BUILD,
+        "Listen to start build",
+    )
+    def start_build(self, event: Event):
+        ...
+```
 
 ## Setup
 

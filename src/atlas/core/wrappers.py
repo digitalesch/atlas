@@ -1,5 +1,5 @@
 import inspect
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from atlas.events.event import Event, EventType
 from atlas.events.event_bus import EventBus
@@ -42,9 +42,9 @@ def auto_register(cls):
 def log_publish(func):
     def wrapper(self, event: Event, *args, **kwargs):
         caller = inspect.stack()[1]
-        print(f"[{datetime.now(timezone.utc)}] Publishing {event.type} for [{caller.function}]")
+        print(f"[{datetime.now(UTC)}] Publishing {event.type} for [{caller.function}]")
         result = func(self, event, *args, **kwargs)
-        print(f"[{datetime.now(timezone.utc)}] Finished {event.type}")
+        print(f"[{datetime.now(UTC)}] Finished {event.type}")
 
         return result
 

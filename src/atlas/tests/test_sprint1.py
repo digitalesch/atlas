@@ -15,15 +15,15 @@ criteria from the Atlas project memory (Section 27):
 from __future__ import annotations
 
 import inspect
+
 import pytest
 
-from atlas.compiler.compiler import Compiler
 from atlas.events.event import Event, EventType
 from atlas.events.event_bus import EventBus
 from atlas.events.listener_registry import ListenerRegistry
 from atlas.events.subscription import Subscription
-from atlas.machines.machine_registry import MachineRegistry
 from atlas.machines.machine import Machine
+from atlas.machines.machine_registry import MachineRegistry
 
 
 @pytest.fixture
@@ -174,7 +174,7 @@ def test_9_atlas_end_to_end_compile():
 
 
 def test_10_subscription_matches_by_type_only_not_message(bus_and_registry):
-    bus, registry = bus_and_registry
+    bus, _ = bus_and_registry
     calls = []
     bus.subscribe(
         Subscription(Event(EventType.LOG, "original text"), lambda e: calls.append(e), "A")

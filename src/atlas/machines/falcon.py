@@ -1,8 +1,8 @@
-from atlas.machines.machine import Machine
+from atlas.machines.components.bed import BuildPlate
 from atlas.machines.components.frame import BoxedTowerFrame
 from atlas.machines.components.motion import CoreXY
-from atlas.machines.components.bed import BuildPlate
 from atlas.machines.components.toolhead import Toolhead
+from atlas.machines.machine import Machine
 
 Falcon = Machine(
     name="Falcon",

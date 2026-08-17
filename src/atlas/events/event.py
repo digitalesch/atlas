@@ -1,17 +1,17 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, auto
 
 
 class EventType(Enum):
-    EMIT = 1
-    SUBSCRIBE = 2
-    UNSUBSCRIBE = 3
-    ERROR = 4
-    LOG = 5
-    START_BUILD = 6
-    END_BUILD = 7
-    COMPILE_START = 8
-    COMPILE_END = 8
+    EMIT = auto()
+    SUBSCRIBE = auto()
+    UNSUBSCRIBE = auto()
+    ERROR = auto()
+    LOG = auto()
+    START_BUILD = auto()
+    END_BUILD = auto()
+    COMPILE_START = auto()
+    COMPILE_END = auto()
 
 
 @dataclass

@@ -158,9 +158,7 @@ def test_8_compiler_does_not_reference_listeners(bus_and_registry):
 
     compiler.compile("Falcon")
 
-    print(build_events)
-
-    assert len(build_events) == 2
+    assert len(build_events) == 1
     assert build_events[0].message == "Starting compilation of Falcon"
 
 

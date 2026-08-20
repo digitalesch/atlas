@@ -1,8 +1,10 @@
+from atlas.core.wrappers import auto_register, subscribe
 from atlas.events.event import Event, EventType
 from atlas.events.event_bus import EventBus
 from atlas.machines.machine_registry import MachineRegistry
 
 
+@auto_register
 class Compiler:
 
     def __init__(
@@ -13,6 +15,11 @@ class Compiler:
         self.event_bus = event_bus
         self.machine_registry = machine_registry
 
+    @subscribe(EventType.END_BUILD, "Listen to end build")
+    def on_end_compile(self, event: Event):
+        print("[END] Ending build")
+
+    # @subscribe(EventType.END_BUILD, "Listen to finish of compilation")
     def compile(self, machine_name: str = ""):
 
         machine = self.machine_registry.get(machine_name)
@@ -35,18 +42,21 @@ class Compiler:
                 )
             )
 
-            self.event_bus.publish(
-                Event(
-                    EventType.END_BUILD,
-                    f"Finished building {machine.name}",
-                    payload=machine,
-                )
-            )
 
             self.event_bus.publish(
                 Event(
                     EventType.COMPILE_END,
                     f"Compilation finished: {machine.name}",
+                    payload=machine,
+                )
+            )
+
+            print(self.event_bus.listener_registry.registry)
+
+            self.event_bus.publish(
+                Event(
+                    EventType.END_BUILD,
+                    f"Finished building {machine.name}",
                     payload=machine,
                 )
             )

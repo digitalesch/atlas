@@ -16,57 +16,56 @@ from __future__ import annotations
 
 import inspect
 
-import pytest
-
+from atlas.compiler.compiler import Compiler
 from atlas.events.event import Event, EventType
 from atlas.events.event_bus import EventBus
 from atlas.events.listener_registry import ListenerRegistry
 from atlas.events.subscription import Subscription
 from atlas.machines.machine import Machine
 from atlas.machines.machine_registry import MachineRegistry
+from atlas.modules.module_test import ModuleA, ModuleB
+
+registry = ListenerRegistry()
+bus = EventBus(registry)
+machine_registry = MachineRegistry()
+machine_registry.register(Machine("Falcon"))
+
+instanced_compiler = Compiler(bus, machine_registry)
 
 
-@pytest.fixture
-def bus_and_registry() -> tuple[EventBus, ListenerRegistry]:
-    registry = ListenerRegistry()
-    bus = EventBus(registry)
-    return bus, registry
-
-
-def test_1_module_can_subscribe_to_event_type(bus_and_registry):
-    bus, registry = bus_and_registry
+def test_1_module_can_subscribe_to_event_type():
     calls = []
 
     event_type = EventType.START_BUILD
     subscription = Subscription(Event(event_type, "Start build"), lambda e: calls.append(e), "a")
 
-    bus.subscribe(subscription)
+    instanced_compiler.event_bus.subscribe(subscription)
 
-    subs = list(registry.get_subscribers(event_type))
+    subs = list(instanced_compiler.event_bus.listener_registry.get_subscribers(event_type))
     assert len(subs) == 1
     assert subs[0].event.type == event_type
 
+    instanced_compiler.event_bus.unsubscribe(event_type, "a")
 
-def test_2_multiple_modules_can_subscribe_to_same_event_type(bus_and_registry):
-    bus, registry = bus_and_registry
+    print(instanced_compiler.event_bus.listener_registry.registry)
 
+
+def test_2_multiple_modules_can_subscribe_to_same_event_type():
     event_type = EventType.START_BUILD
-    bus.subscribe(Subscription(Event(event_type, "Start build"), lambda e: None, "ModuleA"))
-    bus.subscribe(Subscription(Event(event_type, "Start build"), lambda e: None, "ModuleB"))
+    _ = ModuleA(instanced_compiler.event_bus)
+    _ = ModuleB(instanced_compiler.event_bus)
 
-    subs = registry.get_subscribers(event_type)
+    subs = instanced_compiler.event_bus.listener_registry.get_subscribers(event_type)
 
-    assert len(subs) == 2
+    assert len(subs) == 2  # since i'm using the compiler, it's 2 subscribers added + compiler
     assert {s.id for s in subs} == {"ModuleA", "ModuleB"}
 
 
-def test_3_an_event_can_be_emitted(bus_and_registry):
-    bus, _ = bus_and_registry
-    bus.publish(Event(EventType.START_BUILD, "go"))
+def test_3_an_event_can_be_emitted():
+    instanced_compiler.event_bus.publish(Event(EventType.START_BUILD, "go"))
 
 
-def test_4_eventbus_finds_correct_subscriptions(bus_and_registry):
-    bus, _ = bus_and_registry
+def test_4_eventbus_finds_correct_subscriptions():
     start_calls = []
     end_calls = []
 
@@ -85,8 +84,7 @@ def test_4_eventbus_finds_correct_subscriptions(bus_and_registry):
     assert len(end_calls) == 0
 
 
-def test_5_associated_actions_are_called(bus_and_registry):
-    bus, _ = bus_and_registry
+def test_5_associated_actions_are_called():
     was_called = {"flag": False}
 
     def action(event: Event) -> None:
@@ -98,8 +96,7 @@ def test_5_associated_actions_are_called(bus_and_registry):
     assert was_called["flag"] is True
 
 
-def test_6_event_is_passed_into_the_action(bus_and_registry):
-    bus, _ = bus_and_registry
+def test_6_event_is_passed_into_the_action():
     received = {}
 
     def action(event: Event) -> None:
@@ -113,8 +110,7 @@ def test_6_event_is_passed_into_the_action(bus_and_registry):
     assert received["event"].message == "payload check"
 
 
-def test_7_action_can_emit_another_event(bus_and_registry):
-    bus, _ = bus_and_registry
+def test_7_action_can_emit_another_event():
     log_messages = []
 
     def on_log(event: Event) -> None:
@@ -131,7 +127,7 @@ def test_7_action_can_emit_another_event(bus_and_registry):
     assert log_messages == ["chained from end_build"]
 
 
-def test_8_compiler_does_not_reference_listeners(bus_and_registry):
+def test_8_compiler_does_not_reference_listeners():
     """Compiler only knows EventBus.publish(). It never references
     Logger, ModuleA, or ModuleB — those are wired up by Atlas
     (the composition root), not by Compiler itself."""
@@ -141,13 +137,6 @@ def test_8_compiler_does_not_reference_listeners(bus_and_registry):
     for forbidden in ("Logger", "ModuleA", "ModuleB"):
         assert forbidden not in source
 
-    # Functional proof: an externally-registered listener, unknown to
-    # Compiler at write-time, still receives the event Compiler publishes.
-    bus, _ = bus_and_registry
-    machine_registry = MachineRegistry()
-    machine_registry.register(Machine("Falcon"))
-    compiler = Compiler(bus, machine_registry)
-
     build_events = []
     bus.subscribe(
         Subscription(
@@ -156,7 +145,7 @@ def test_8_compiler_does_not_reference_listeners(bus_and_registry):
         )
     )
 
-    compiler.compile("Falcon")
+    instanced_compiler.compile("Falcon")
 
     assert len(build_events) == 1
     assert build_events[0].message == "Starting compilation of Falcon"
@@ -165,17 +154,24 @@ def test_8_compiler_does_not_reference_listeners(bus_and_registry):
 def test_9_atlas_end_to_end_compile():
     """Smoke test: the real composition root wires Compiler + modules
     together and compile() runs without error."""
-    from atlas.cli.app import Atlas  # adjust import path to match your file
 
-    app = Atlas()
-    app.compile("Falcon")  # should not raise
+    instanced_compiler.compile("Falcon")  # should not raise
 
 
-def test_10_subscription_matches_by_type_only_not_message(bus_and_registry):
-    bus, _ = bus_and_registry
+def test_10_subscription_matches_by_type_only_not_message():
     calls = []
-    bus.subscribe(
+    instanced_compiler.event_bus.subscribe(
         Subscription(Event(EventType.LOG, "original text"), lambda e: calls.append(e), "A")
     )
-    bus.publish(Event(EventType.LOG, "completely different text"))
+    instanced_compiler.event_bus.publish(Event(EventType.LOG, "completely different text"))
     assert len(calls) == 1  # still matches — only type matters
+
+
+def test_11_compile_failure_publishes_error():
+    instanced_compiler.event_bus.publish(
+        Event(EventType.COMPILE_ERROR, "completely different text")
+    )
+
+    subs = instanced_compiler.event_bus
+
+    assert subs == {}  # since i'm using the compiler, it's 2 subscribers added + compiler

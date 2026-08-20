@@ -12,6 +12,7 @@ class EventType(Enum):
     END_BUILD = auto()
     COMPILE_START = auto()
     COMPILE_END = auto()
+    COMPILE_ERROR = auto()
 
 
 @dataclass

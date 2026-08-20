@@ -32,7 +32,7 @@ def auto_register(cls):
             attr = getattr(self, name)
             if callable(attr) and hasattr(attr, "_subscribe_event"):
                 event_bus.listener_registry.register(
-                    Subscription(event=attr._subscribe_event, callback=attr)
+                    Subscription(event=attr._subscribe_event, callback=attr, id=cls.__name__)
                 )
 
     cls.__init__ = wrapped_init

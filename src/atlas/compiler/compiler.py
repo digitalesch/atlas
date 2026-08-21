@@ -60,3 +60,11 @@ class Compiler:
                     payload=machine,
                 )
             )
+        else:
+            self.event_bus.publish(
+                Event(
+                    EventType.COMPILE_ERROR,
+                    "No machine passed",
+                    payload=machine,
+                )
+            )

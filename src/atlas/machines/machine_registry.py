@@ -10,4 +10,4 @@ class MachineRegistry:
         self.machines[machine.name] = machine
 
     def get(self, name: str) -> Machine:
-        return self.machines[name]
+        return self.machines.get(name)

@@ -19,10 +19,6 @@ def auto_register(cls):
     cls._instance_count = 0
 
     def wrapped_init(self, event_bus: EventBus, *args, **kwargs):
-        cls._instance_count += 1
-        if cls._instance_count > 1:
-            raise RuntimeError(f"{cls.__name__} should only be instantiated once")
-
         if original_init is not object.__init__:
             original_init(self, event_bus, *args, **kwargs)
 
